@@ -8,8 +8,9 @@ import torchvision
 import torchvision.models as models
 import torchvision.transforms as transforms
 import os
-
 import argparse
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 def test(model, test_loader, criterion, device):
@@ -86,7 +87,7 @@ def train(model, train_loader, validation_loader, criterion, optimizer, epochs, 
                     )
 
                 # NOTE: Comment lines below to train and test on whole dataset
-                if running_samples > (0.2 * len(image_dataset[phase].dataset)):
+                if running_samples > (0.1 * len(image_dataset[phase].dataset)):
                     break
 
             epoch_loss = running_loss / running_samples
@@ -200,7 +201,7 @@ if __name__ == '__main__':
     )
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
     parser.add_argument("--train-dir", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
-    parser.add_argument("--val-dir", type=str, default=os.environ["SM_CHANNEL_VAL"])
+    parser.add_argument("--val-dir", type=str, default=os.environ["SM_CHANNEL_VALID"])
     parser.add_argument("--test-dir", type=str, default=os.environ["SM_CHANNEL_TEST"])
 
     args = parser.parse_args()

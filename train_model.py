@@ -8,8 +8,10 @@ import torchvision
 import torchvision.models as models
 import torchvision.transforms as transforms
 
+import os
 import argparse
-
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 from smdebug import modes
 from smdebug.pytorch import get_hook
 
@@ -54,11 +56,11 @@ def train(model, train_loader, validation_loader, criterion, optimizer, epochs, 
         for phase in ['train', 'valid']:
             print(f"Epoch {epoch}, Phase {phase}")
             if phase == 'train':
-                model.train()
                 hook.set_mode(modes.TRAIN)
+                model.train()
             else:
-                model.eval()
                 hook.set_mode(modes.EVAL)
+                model.eval()
             running_loss = 0.0
             running_corrects = 0
             running_samples = 0
@@ -92,8 +94,8 @@ def train(model, train_loader, validation_loader, criterion, optimizer, epochs, 
                     )
 
                 # NOTE: Comment lines below to train and test on whole dataset
-                if running_samples > (0.2 * len(image_dataset[phase].dataset)):
-                    break
+                # if running_samples > (0.2 * len(image_dataset[phase].dataset)):
+                #     break
 
             epoch_loss = running_loss / running_samples
             epoch_acc = running_corrects / running_samples
@@ -204,16 +206,16 @@ if __name__=='__main__':
     parser.add_argument(
         "--epochs",
         type=int,
-        default=2,
+        default=5,
         metavar="N",
-        help="number of epochs to train (default: 2)",
+        help="number of epochs to train (default: 5)",
     )
     parser.add_argument(
         "--lr", type=float, default=1.0, metavar="LR", help="learning rate (default: 1.0)"
     )
     parser.add_argument("--model-dir", type=str, default=os.environ["SM_MODEL_DIR"])
     parser.add_argument("--train-dir", type=str, default=os.environ["SM_CHANNEL_TRAIN"])
-    parser.add_argument("--val-dir", type=str, default=os.environ["SM_CHANNEL_VAL"])
+    parser.add_argument("--val-dir", type=str, default=os.environ["SM_CHANNEL_VALID"])
     parser.add_argument("--test-dir", type=str, default=os.environ["SM_CHANNEL_TEST"])    
     
     args=parser.parse_args()
