@@ -151,7 +151,6 @@ def main(args):
     TODO: Initialize a model by calling the net function
     '''
     hook = get_hook(create_if_not_exists=True)
-    hook.register_loss(criterion)
     
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = net()
@@ -161,6 +160,7 @@ def main(args):
     '''
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.fc.parameters(), lr=args.lr)
+    hook.register_loss(criterion)
 
     '''
     TODO: Call the train function to start training your model
@@ -171,12 +171,14 @@ def main(args):
     testloader = create_data_loaders(args.test_dir, args.test_batch_size)
 
     model = train(model, trainloader, valloader, criterion,
-                  optimizer, args.epochs, device)
+                  optimizer, args.epochs, device, hook)
+    print ('training job finished')
 
     '''
     TODO: Test the model to see its accuracy
     '''
-    test(model, testloader, criterion, device)
+    test(model, testloader, criterion, device, hook)
+    print ('test job finished')
 
     '''
     TODO: Save the trained model
@@ -206,9 +208,9 @@ if __name__=='__main__':
     parser.add_argument(
         "--epochs",
         type=int,
-        default=5,
+        default=2,
         metavar="N",
-        help="number of epochs to train (default: 5)",
+        help="number of epochs to train (default: 2)",
     )
     parser.add_argument(
         "--lr", type=float, default=1.0, metavar="LR", help="learning rate (default: 1.0)"
