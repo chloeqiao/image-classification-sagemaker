@@ -112,8 +112,8 @@ def train(model, train_loader, validation_loader, criterion, optimizer, epochs, 
                 else:
                     loss_counter += 1
 
-        if loss_counter == 1:
-            break
+        # if loss_counter == 1:
+        #     break
     return model
     
 def net():
@@ -147,9 +147,11 @@ def save_model(model, model_dir):
     torch.save(model.state_dict(), path)
     
 def model_fn(model_dir):
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = net()
     with open(os.path.join(model_dir, "model.pth"), "rb") as f:
         model.load_state_dict(torch.load(f))
+    model = model.to(device)
     return model
 
 def main(args):
@@ -175,7 +177,9 @@ def main(args):
     trainloader = create_data_loaders(args.train_dir, args.batch_size)
     valloader = create_data_loaders(args.val_dir, args.batch_size)
     testloader = create_data_loaders(args.test_dir, args.test_batch_size)
-
+    
+    print ("number of epochs:", args.epochs)
+    
     model = train(model, trainloader, valloader, criterion,
                   optimizer, args.epochs, device, hook)
     print ('training job finished')
