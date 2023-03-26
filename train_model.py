@@ -12,8 +12,12 @@ import os
 import argparse
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-from smdebug import modes
-from smdebug.pytorch import get_hook
+try:
+    from smdebug import modes
+    from smdebug.pytorch import get_hook
+except ModuleNotFoundError:
+    print ("module smdebug is not installed.")
+    
 
 
 #TODO: Import dependencies for Debugging andd Profiling
@@ -24,6 +28,7 @@ def test(model, test_loader, criterion, device, hook):
           testing data loader and will get the test accuray/loss of the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    print ('test job start')
     hook.set_mode(modes.PREDICT)
     model.eval()
     running_loss = 0
@@ -48,6 +53,7 @@ def train(model, train_loader, validation_loader, criterion, optimizer, epochs, 
           data loaders for training and will get train the model
           Remember to include any debugging/profiling hooks that you might need
     '''
+    print ('training job start')
     best_loss = 1e6
     image_dataset = {'train': train_loader, 'valid': validation_loader}
     loss_counter = 0
@@ -201,16 +207,16 @@ if __name__=='__main__':
     parser.add_argument(
         "--test-batch-size",
         type=int,
-        default=1000,
+        default=64,
         metavar="N",
-        help="input batch size for testing (default: 1000)",
+        help="input batch size for testing (default: 64)",
     )
     parser.add_argument(
         "--epochs",
         type=int,
-        default=2,
+        default=5,
         metavar="N",
-        help="number of epochs to train (default: 2)",
+        help="number of epochs to train (default: 5)",
     )
     parser.add_argument(
         "--lr", type=float, default=1.0, metavar="LR", help="learning rate (default: 1.0)"
